@@ -117,7 +117,7 @@ sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
 
 ### Gradana
 
-install
+install & setup
 ```bash
 sudo apt install -y software-properties-common
 sudo apt install -y gnupg2 curl
@@ -164,12 +164,7 @@ nu: admin
 ps:admin 
 and set new password
 ```
-### SETUP
 
-sample querry 
-```mysql
-SELECT temperature, timestamp FROM `sensor_data` WHERE `sensor_name` LIKE 'Sensor2' ;
-```
 Grafana querrys
 
 ```mysql
@@ -180,29 +175,6 @@ FROM
   rod.sensor_data
 WHERE
   `sensor_name` LIKE 'Sensor1';
-
-```
-
-```mysql
-SELECT
-  MAX(humidity) as 'Przedpokój 2 maksymalna wilgotność w %',
-  MIN(humidity) as 'Przedpokój 2 minimalna wilgotność w %'
-FROM
-  rod.sensor_data
-WHERE
-  `sensor_name` LIKE 'Sensor2';
-```
-
-## Sensor data gathering 
-
-### Pacages to install
-
-Install required libraries
-```bash
-pip install adafruit-circuitpython-dht mysql-connector-python
-pip3 install adafruit-circuitpython-dht
-sudo python3 -m pip install --upgrade pip setuptools wheel
-sudo pip3 install Adafruit_DHT
 
 ```
 

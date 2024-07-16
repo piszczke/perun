@@ -1,31 +1,29 @@
-# perun
+# PERUN
 Perun project - Home data gathering system for future metric analysis 
 
+## Overview
 
-# Raspberry pi server instructionset
+Complete Hardware-Software solution Based on raspberry pi server and ESP nodes for gathering environmental data like temperature, humidity, soil humidity in flower pots, mini brine graduation tower, dor sensors, light sensors and ore for simple house management.  
+Additionally functionality for further projects 
+## Hardware Components
 
-###### TAG 
+## Software Components 
 
-:::info
-First part is based on this note: 
-https://hackmd.io/idIXARJRRBSJU1DxgwZzxg
-:::
+### System Setup 
 
+System instal and configuration 
 
-## Basic system confiuration 
-
-### Update & Upgrade
+#### basic updates
 
 ```bash
 sudo apt-get update
 sudo apt-get upgrade
 ```
 
-### SSH
+#### SSH
 
-(install and) enable ssh
-(`sudo apt-get install openssh-client
-`)
+install and enable ssh
+
 ```bash
 sudo systemctl enable ssh
 ```
@@ -36,50 +34,33 @@ Open ssh tcp port 22 using ufw firewall
 sudo systemctl enable ssh
 sudo ufw allow ssh
 ```
-:::success
-Display ip addrees of node
 
-`hostname -I`
+Display ip address of node
+```hostname -I```
 
-:::
 
-### sudo password
+#### sudo password
 
 Set sudo password
 ```bash
 passwd
 ```
 
-## Pacages to install 
-
-
-### Basic
-
-:::info
-Install list of basic packages 
-:::
+#### Packages to install  
 
 ```bash
 sudo apt install tmux htop nano vsftpd mpg123 vlc mcrypt php wget pip python3-pip git python3-dev
 ```
-### Timezon
+#### Timezone
+
 setup timezone 
 ```bash=
 timedatectl
 timedatectl list-timezones
 sudo timedatectl set-timezone Europe/Warsaw
 ```
-### Alias
-
-```bash
-alias ll="ls -l"    
-```
-
-
 
 ### Apache
-
-based on `https://pimylifeup.com/raspberry-pi-apache/`
 
 install
 ```bash
@@ -104,7 +85,6 @@ https://github.com/pi-hole/pi-hole/#curl--ssl-httpsinstallpi-holenet--bash
 `curl -sSL https://install.pi-hole.net | bash`
 ### Database
 
-based on `https://pimylifeup.com/raspberry-pi-mysql/`
 
 #### mariadb-server install
 ```bash
@@ -121,7 +101,7 @@ sudo mysql --user=root --password
 > exit;
 ```
 
-#### phpmyadmin
+### phpmyadmin
 
 install
 ```bash
@@ -135,7 +115,7 @@ sudo service apache2 restart
 sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
 ```
 
-#### Gradana
+### Gradana
 
 install
 ```bash
@@ -167,7 +147,7 @@ nu: admin
 ps:admin 
 and set new password
 ```
-##### SETUP
+### SETUP
 
 sample querry 
 ```mysql
@@ -237,185 +217,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable my_script.service
 sudo systemctl start my_script.service
 ```
-
-
-
-## Program do kolekcji danych
-
-```python  
-import Adafruit_DHT
-import requests
-import time
-import mysql.connector
-
-# DHT22 sensor configurations
-DHT_SENSOR_1 = Adafruit_DHT.DHT22
-DHT_PIN_1 = 4
-
-DHT_SENSOR_2 = Adafruit_DHT.DHT22
-DHT_PIN_2 = 24
-
-DHT_SENSOR_3 = Adafruit_DHT.DHT22
-DHT_PIN_3 = 18
-
-DELAY_TIME = 20 #Time betwien data collection in seconds
-
-def read_sensor_data(sensor, pin):
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    return humidity, temperature
-
-def insert_data_to_db(cursor, sensor_name, temperature, humidity, status=None):
-    insert_query = "INSERT INTO sensor_data (sensor_name, temperature, humidity, status, timestamp) VALUES (%s, %s, %s, %s, NOW())"
-    data = (sensor_name, temperature, humidity, status)
-    print (data)
-    cursor.execute(insert_query, data)
-
-def main():
-    try:
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="dom",
-            password="domdom",
-            database="rod"
-        )
-        cursor = conn.cursor()
-
-        while True:
-            humidity1, temperature1 = read_sensor_data(DHT_SENSOR_1, DHT_PIN_1)
-            humidity2, temperature2 = read_sensor_data(DHT_SENSOR_2, DHT_PIN_2)
-            humidity3, temperature3 = read_sensor_data(DHT_SENSOR_3, DHT_PIN_3)
-
-            if humidity1 is not None and temperature1 is not None:
-                if humidity1 > 100:
-                    insert_data_to_db(cursor, "Sensor1", temperature1, humidity1, "Humidity too high")
-                else:
-                    insert_data_to_db(cursor, "Sensor1", temperature1, humidity1)
-
-            if humidity2 is not None and temperature2 is not None:
-                if humidity2 > 100:
-                    insert_data_to_db(cursor, "Sensor2", temperature2, humidity2, "Humidity too high")
-                else:
-                    insert_data_to_db(cursor, "Sensor2", temperature2, humidity2)
-
-            if humidity3 is not None and temperature3 is not None:
-                if humidity3 > 100:
-                    insert_data_to_db(cursor, "Sensor3", temperature3, humidity3, "Humidity too high")
-                else:
-                    insert_data_to_db(cursor, "Sensor3", temperature3, humidity3)
-
-            conn.commit()
-            time.sleep(DELAY_TIME)
-
-    except KeyboardInterrupt:
-        print("Data collection stopped by the user.")
-    except Exception as e:
-        print("Error:", e)
-    finally:
-        cursor.close()
-        conn.close()
-
-if __name__ == "__main__":
-    main()
-
-```
-
-## Program do kolekcji danyc II
-
-
-```python
-
-import Adafruit_DHT
-import requests
-import time
-import mysql.connector
-import logging
-
-# Configure the logging
-logging.basicConfig(filename='sensor_data.log', level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s: %(message)s')
-
-# DHT22 sensor configurations
-DHT_SENSOR_1 = Adafruit_DHT.DHT22
-DHT_PIN_1 = 4
-
-DHT_SENSOR_2 = Adafruit_DHT.DHT22
-DHT_PIN_2 = 24
-
-DHT_SENSOR_3 = Adafruit_DHT.DHT22
-DHT_PIN_3 = 18
-
-# New Sensor
-DHT_SENSOR_4 = Adafruit_DHT.DHT22
-DHT_PIN_4 = 25
-
-# Delay time
-DELAY_TIME = 20
-
-def read_sensor_data(sensor, pin):
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    return humidity, temperature
-
-def insert_data_to_db(cursor, sensor_name, temperature, humidity, status=None):
-    insert_query = "INSERT INTO sensor_data (sensor_name, temperature, humidity, status, timestamp) VALUES (%s, %s, %s, %s, NOW())"
-    data = (sensor_name, temperature, humidity, status)
-    cursor.execute(insert_query, data)
-    logging.info(f"{sensor_name}: Data inserted")
-
-def main():
-    conn = None
-    cursor = None
-
-    try:
-        while True:
-            if conn is None:
-                conn = mysql.connector.connect(
-                    host="your_mysql_host",
-                    user="your_mysql_username",
-                    password="your_mysql_password",
-                    database="your_mysql_database"
-                )
-                cursor = conn.cursor()
-
-            # Read and insert data for each sensor
-            for sensor_name, sensor_pin in [
-                ("Sensor1", DHT_PIN_1),
-                ("Sensor2", DHT_PIN_2),
-                ("Sensor3", DHT_PIN_3),
-                ("Sensor4", DHT_PIN_4)
-            ]:
-                humidity, temperature = read_sensor_data(Adafruit_DHT.DHT22, sensor_pin)
-                if humidity is not None and temperature is not None:
-                    if humidity > 100:
-                        insert_data_to_db(cursor, sensor_name, temperature, humidity, "Humidity too high")
-                    else:
-                        insert_data_to_db(cursor, sensor_name, temperature, humidity)
-
-            conn.commit()
-
-            # Close the database connection
-            cursor.close()
-            conn.close()
-            conn = None
-            cursor = None
-
-            time.sleep(DELAY_TIME)
-
-    except KeyboardInterrupt:
-        logging.info("Data collection stopped by the user.")
-        print("Data collection stopped by the user.")
-    except Exception as e:
-        logging.error(f"Error: {e}")
-        print("Error:", e)
-    finally:
-        if conn is not None:
-            cursor.close()
-            conn.close()
-
-if __name__ == "__main__":
-    main()
-
-```
-
 
 
 

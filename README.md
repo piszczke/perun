@@ -119,15 +119,32 @@ sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
 
 install
 ```bash
-sudo apt-get install -y apt-transport-https software-properties-common wget
-sudo mkdir -p /etc/apt/keyrings/
-wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
-echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
-echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com beta main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
-sudo apt-get install grafana
+sudo apt install -y software-properties-common
+sudo apt install -y gnupg2 curl
+curl https://packages.grafana.com/gpg.key | sudo apt-key add -
+sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+sudo apt update
+sudo apt install grafana
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server
+sudo systemctl status grafana-server
 ```
 
-setup
+Access the Grafana web interface:
+
+Open your web browser and navigate to http://<your-raspberry-pi-ip>:3000. The default port for Grafana is 3000.
+
+Log in to Grafana:
+
+The default login credentials are:
+
+Username: admin
+Password: admin
+After the first login, you will be prompted to change the default password.
+
+That's it! You now have Grafana installed and running on your Raspbian system.
+
+Setup
 ```bash
 mysql --user=root --password
 CREATE USER 'grafanaReader' IDENTIFIED BY 'password';

@@ -117,34 +117,17 @@ sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
 
 ### Gradana
 
-install & setup
+install
 ```bash
-sudo apt install -y software-properties-common
-sudo apt install -y gnupg2 curl
-curl https://packages.grafana.com/gpg.key | sudo apt-key add -
-sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
-sudo apt update
-sudo apt install grafana
-sudo systemctl start grafana-server
-sudo systemctl enable grafana-server
-sudo systemctl status grafana-server
+sudo apt-get install -y apt-transport-https software-properties-common wget
+sudo mkdir -p /etc/apt/keyrings/
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com beta main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+sudo apt-get install grafana
 ```
 
-Access the Grafana web interface:
-
-Open your web browser and navigate to http://<your-raspberry-pi-ip>:3000. The default port for Grafana is 3000.
-
-Log in to Grafana:
-
-The default login credentials are:
-
-Username: admin
-Password: admin
-After the first login, you will be prompted to change the default password.
-
-That's it! You now have Grafana installed and running on your Raspbian system.
-
-Setup
+setup
 ```bash
 mysql --user=root --password
 CREATE USER 'grafanaReader' IDENTIFIED BY 'password';
@@ -164,19 +147,23 @@ nu: admin
 ps:admin 
 and set new password
 ```
+### Pacages to install
 
-Grafana querrys
-
-```mysql
-SELECT
-  MAX(humidity) as 'Przedpokój 1 maksymalna wilgotność w %',
-  MIN(humidity) as 'Przedpokój 1 minimalna wilgotność w %'
-FROM
-  rod.sensor_data
-WHERE
-  `sensor_name` LIKE 'Sensor1';
-
+Install required libraries
+```bash
+pip install adafruit-circuitpython-dht mysql-connector-python
+pip3 install adafruit-circuitpython-dht
+sudo python3 -m pip install --upgrade pip setuptools wheel
+sudo pip3 install Adafruit_DHT
 ```
+
+#### FASTAPI
+
+```bash
+pip install fastapi
+```
+
+
 
 ### Setup script as a service using systemd
 
